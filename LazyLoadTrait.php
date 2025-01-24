@@ -18,6 +18,8 @@ use yii\base\{InvalidConfigException, UnknownPropertyException};
  * *
  * class ProfileController extends yii/web/Controller
  * {
+ *  use LazyLoadTrait;
+ *
  *  public array $lazyLoadConfig = [
  *      'foo' => Foo::class,
  *      'bar' => [ 'class' => Bar::class ]
