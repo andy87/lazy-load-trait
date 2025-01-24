@@ -28,7 +28,7 @@ class SomeController extends \yii\web\Controller
         // Apply LazyLoad
         $text = $this->someComponent->insideSomeComponent->test();
 
-        return $this->render('view', ['text' => $tex t]);
+        return $this->render('view', ['text' => $text]);
     }
 }
 ```
