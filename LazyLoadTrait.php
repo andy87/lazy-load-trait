@@ -63,9 +63,11 @@ trait LazyLoadTrait
      * Создание объекта по имеющимся данным конфига
      * в классе использующем трейт
      *
+     * @param string $name
+     *
      * @throws InvalidConfigException
      */
-    public function checkLazyLoadObject($name): mixed
+    public function checkLazyLoadObject(string $name): mixed
     {
         $config = $this->lazyLoadConfig[$name] ?? null;
 
@@ -76,7 +78,7 @@ trait LazyLoadTrait
 
             if ( is_array($config)) {
                 if( count($config) === 2 ) {
-                    return Yii::createObject( $config[0], $config[2] );
+                    return Yii::createObject( $config[0], $config[1] );
                 }
 
                 return Yii::createObject( $config );
