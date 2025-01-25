@@ -1,6 +1,6 @@
 <?php
 
-namespace common\components\traits;
+namespace yii2\common\components\traits;
 
 use Yii;
 use yii\base\{InvalidConfigException, UnknownPropertyException};
@@ -8,53 +8,41 @@ use yii\base\{InvalidConfigException, UnknownPropertyException};
 /**
  * Trait LazyLoad
  *
- * @property array $lazyLoadConfig
+ * @property array $lazyLoadConfig Конфигурация для ленивой загрузки объектов
  *
+ * Пример использования:
  * ```php
- * *
- * * @property-read Foo $foo
- * * @property-read Bar $bar
- * * @property-read Zero $zero
- * *
- * class ProfileController extends yii/web/Controller
+ * @property-read Foo $foo (пример)
+ * @property-read Bar $bar (пример)
+ * @property-read Zero $zero (пример)
+ *
+ * class ProfileController extends yii\web\Controller
  * {
- *  use LazyLoadTrait;
+ *     use LazyLoadTrait;
  *
- *  public array $lazyLoadConfig = [
- *      'foo' => Foo::class,
- *      'bar' => [ 'class' => Bar::class ]
- *      'zero' => [ [ 'class' => Zero::class ], [ 'token' ] ]
- *  ];
- *
- *   public function actionIndex()
- *   {
- *      // ...
- *
- *      $this->foo->method();
- *
- *      // ...
- *   }
+ *     public array $lazyLoadConfig = [
+ *         'foo' => Foo::class,
+ *         'bar' => ['class' => Bar::class],
+ *         '_zero' => [['class' => Zero::class], ['token']], // Singleton
+ *     ];
  * }
- *
  * ```
- *
- * @package yii2\common\components\traits
  */
 trait LazyLoadTrait
 {
+    /** @var array Кэш для ленивых объектов */
+    private array $_lazyLoadCache = [];
+
     /**
-     * Модифицированный метод __get для ленивой загрузки объектов
+     * Переопределение магического метода __get для ленивой загрузки
      *
-     * @param $name
-     *
+     * @param string $name Имя свойства
      * @return mixed
-     *
      * @throws UnknownPropertyException|InvalidConfigException
      */
     public function __get($name): mixed
     {
-        if ( $lazyLoadObject = $this->checkLazyLoadObject($name) )
-        {
+        if ($lazyLoadObject = $this->getLazyLoadObject($name)) {
             return $lazyLoadObject;
         }
 
@@ -62,31 +50,52 @@ trait LazyLoadTrait
     }
 
     /**
-     * Создание объекта по имеющимся данным конфига
-     * в классе использующем трейт
+     * Получение ленивого объекта
      *
-     * @param string $name
-     *
+     * @param string $name Имя свойства
+     * @return ?object
      * @throws InvalidConfigException
      */
-    public function checkLazyLoadObject(string $name): mixed
+    public function getLazyLoadObject(string $name): ?object
     {
+        if (isset($this->_lazyLoadCache[$name])) {
+            return $this->_lazyLoadCache[$name];
+        }
+
         $config = $this->lazyLoadConfig[$name] ?? null;
 
-        if ( $config ) {
-            if ( is_string($config) ) {
-                return Yii::createObject( $config );
+        if ($config) {
+            $object = $this->constructLazyObject($config);
+
+            if (str_starts_with($name, '_')) {
+                $this->_lazyLoadCache[$name] = $object;
             }
 
-            if ( is_array($config)) {
-                if( count($config) === 2 ) {
-                    return Yii::createObject( $config[0], $config[1] );
-                }
-
-                return Yii::createObject( $config );
-            }
+            return $object;
         }
 
         return null;
+    }
+
+    /**
+     * Создание объекта на основе конфигурации
+     *
+     * @param array|string $config Конфигурация объекта
+     * @return object
+     * @throws InvalidConfigException
+     */
+    protected function constructLazyObject(array|string $config): object
+    {
+        if (is_array($config)) {
+            if (is_array($config[0]) && !isset($config[0]['class'])) {
+                throw new InvalidConfigException('Конфигурация должна содержать ключ "class".');
+            }
+
+            if (isset($config[1]) && is_array($config[1])) {
+                return Yii::createObject($config[0], $config[1]);
+            }
+        }
+
+        return Yii::createObject($config);
     }
 }
