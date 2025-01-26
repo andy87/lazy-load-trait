@@ -33,6 +33,8 @@ trait LazyLoadTrait
     /** @var array Кэш для ленивых объектов */
     private array $_lazyLoadCache = [];
 
+
+
     /**
      * Переопределение магического метода __get для ленивой загрузки
      *
@@ -58,13 +60,12 @@ trait LazyLoadTrait
      */
     public function getLazyLoadObject(string $name): ?object
     {
-        if (isset($this->_lazyLoadCache[$name])) {
-            return $this->_lazyLoadCache[$name];
+        if ($object = $this->findCachedObject($name)) {
+            return $object;
         }
 
-        $config = $this->lazyLoadConfig[$name] ?? null;
-
-        if ($config) {
+        if ($config = $this->findLazyLoadConfig($name)) 
+        {
             $object = $this->constructLazyObject($config);
 
             if (str_starts_with($name, '_')) {
@@ -78,6 +79,26 @@ trait LazyLoadTrait
     }
 
     /**
+     * @param string $name
+     * 
+     * @return object|null
+     */
+    protected function findCachedObject(string $name): ?object
+    {
+        return $this->_lazyLoadCache[$name] ?? null;
+    }
+
+    /**
+     * @param string $name
+     * 
+     * @return array|null
+     */
+    protected function findLazyLoadConfig(string $name): ?array
+    {
+        return $this->lazyLoadConfig[$name] ?? null;
+    }
+
+    /**
      * Создание объекта на основе конфигурации
      *
      * @param array|string $config Конфигурация объекта
@@ -86,7 +107,8 @@ trait LazyLoadTrait
      */
     protected function constructLazyObject(array|string $config): object
     {
-        if (is_array($config)) {
+        if (is_array($config)) 
+        {
             if (is_array($config[0]) && !isset($config[0]['class'])) {
                 throw new InvalidConfigException('Конфигурация должна содержать ключ "class".');
             }
