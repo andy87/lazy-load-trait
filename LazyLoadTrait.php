@@ -64,7 +64,7 @@ trait LazyLoadTrait
             return $object;
         }
 
-        if ($config = $this->findLazyLoadConfig($name)) 
+        if ($config = $this->findLazyLoadConfig($name))
         {
             $object = $this->constructLazyObject($config);
 
@@ -80,7 +80,7 @@ trait LazyLoadTrait
 
     /**
      * @param string $name
-     * 
+     *
      * @return object|null
      */
     protected function findCachedObject(string $name): ?object
@@ -90,7 +90,7 @@ trait LazyLoadTrait
 
     /**
      * @param string $name
-     * 
+     *
      * @return array|null
      */
     protected function findLazyLoadConfig(string $name): ?array
@@ -107,14 +107,17 @@ trait LazyLoadTrait
      */
     protected function constructLazyObject(array|string $config): object
     {
-        if (is_array($config)) 
+        if (is_array($config))
         {
             if (is_array($config[0]) && !isset($config[0]['class'])) {
                 throw new InvalidConfigException('Конфигурация должна содержать ключ "class".');
             }
 
-            if (isset($config[1]) && is_array($config[1])) {
-                return Yii::createObject($config[0], $config[1]);
+            if (isset($config[1]) && is_array($config[1])) 
+            {
+                $_constructParams = array_values($config[1]);
+
+                return Yii::createObject( $config[0], $_constructParams );
             }
         }
 
