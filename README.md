@@ -194,7 +194,7 @@ class SomeClass
     {
         return match ($name)
         {
-            '_dynamicConfigCmponent' => [
+            'dynamicConfigCmponent' => [
                 'class' => [SomeComponent::class, $this->getArguments() ],
             ],
             default => parent::findCachedObject($name),
