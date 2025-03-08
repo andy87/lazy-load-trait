@@ -7,7 +7,7 @@ P.S. Знаю что в PHP c версии 8.4 появилась поддерж
 
 Composer:
 ```bash
-composer require andy87/yii2-lazy-load-trait
+composer require andy87/lazy-load-trait
 ```
 
 ## Порядок дейсвий для использования:
