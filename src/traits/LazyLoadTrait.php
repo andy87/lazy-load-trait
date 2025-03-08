@@ -115,12 +115,12 @@ trait LazyLoadTrait
     {
         if (is_array($config))
         {
-            if (isset($config[0]) && is_array($config[0]) && !isset($config[0]['class'])) {
+            if (count($config) > 1 && !isset($config['class'])) {
                 throw new InvalidConfigException('Конфигурация должна содержать ключ "class".');
             }
 
-            if (isset($config[1]) && is_array($config[1])) {
-                return Yii::createObject( $config[0], array_values($config[1]) );
+            if (isset($config[0]) && is_array($config[0])) {
+                return Yii::createObject( $config['class'], $config[0] );
             }
         }
 
