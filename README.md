@@ -21,10 +21,10 @@ composer require andy87/yii2-lazy-load-trait
 ```php
 <?php
 
-use andy87\yii2\lazyLoadTrait\LazyLoadTrait;
+use andy87\yii2\lazy_load\LazyLoadTrait;
 
 /**
- * SomeController
+ * examples\yii2\frontend\controllers\SomeController
  *
  * @property-read SomeComponent $someComponent
  * @property-read OtherComponent $otherComponent
@@ -32,7 +32,7 @@ use andy87\yii2\lazyLoadTrait\LazyLoadTrait;
  * 
  * @package yii2\controllers
  */
-class SomeController extends \yii\web\Controller
+class examples\yii2\frontend\controllers\SomeController extends \yii\web\Controller
 {
     use LazyLoadTrait;
 
@@ -73,4 +73,8 @@ class SomeController extends \yii\web\Controller
     }
 }
 ```
+
+
+Дополнительные
+
 Home: https://github.com/andy87/yii2-lazy-load-trait

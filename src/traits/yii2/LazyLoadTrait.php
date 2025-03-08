@@ -1,11 +1,12 @@
 <?php
 
-namespace andy87\lazy_load;
+namespace andy87\lazy_load\yii2;
 
-use Exception;
+use Yii;
+use yii\base\{InvalidConfigException, UnknownPropertyException};
 
 /**
- * Trait LazyLoad for Yii2
+ * Trait LazyLoad
  *
  * @property array $lazyLoadConfig Конфигурация для ленивой загрузки объектов
  *
@@ -34,10 +35,7 @@ use Exception;
  */
 trait LazyLoadTrait
 {
-    /** @var array Кэш объектов */
-    protected array $_lazyLoadCache = [];
-
-
+    use \andy87\lazy_load\LazyLoadTrait;
 
     /**
      * Переопределение метода __get
@@ -45,6 +43,8 @@ trait LazyLoadTrait
      * @param string $name Имя запрашиваемого в `BaseObject` свойства
      *
      * @return mixed
+     *
+     * @throws UnknownPropertyException|InvalidConfigException
      */
     public function __get($name): mixed
     {
@@ -53,53 +53,6 @@ trait LazyLoadTrait
         }
 
         return parent::__get($name);
-    }
-
-    /**
-     * Получение объекта LazyLoad
-     *
-     * @param string $name Имя свойства
-     *
-     * @return ?object
-     */
-    public function getLazyLoadObject(string $name): ?object
-    {
-        if ($object = $this->findCachedObject($name)) return $object;
-
-        if ($config = $this->findLazyLoadConfig($name))
-        {
-            $object = $this->constructLazyObject($config);
-
-            if (str_starts_with($name, '_')) $this->_lazyLoadCache[$name] = $object;
-
-            return $object;
-        }
-
-        return null;
-    }
-
-    /**
-     * Возвращает объект из кэша LazyLoad
-     *
-     * @param string $name
-     *
-     * @return ?object
-     */
-    protected function findCachedObject(string $name): ?object
-    {
-        return $this->_lazyLoadCache[$name] ?? null;
-    }
-
-    /**
-     * Поиск/получение LazyLoad конфигурации 
-     *
-     * @param string $name
-     *
-     * @return array|string|null
-     */
-    protected function findLazyLoadConfig(string $name): array|string|null
-    {
-        return $this->lazyLoadConfig[$name] ?? null;
     }
 
     /**
@@ -116,22 +69,14 @@ trait LazyLoadTrait
         if (is_array($config))
         {
             if (count($config) > 1 && !isset($config['class'])) {
-                throw new Exception('Конфигурация должна содержать ключ "class".');
+                throw new InvalidConfigException('Конфигурация должна содержать ключ "class".');
             }
-
-            $object = new $config['class']();
 
             if (isset($config[0]) && is_array($config[0])) {
-                foreach ($config[0] as $name => $value) {
-                    $object->$name = $value;
-                }
+                return Yii::createObject( $config['class'], $config[0] );
             }
-
-        } else {
-
-            $object = new $config();
         }
 
-        return $object;
+        return Yii::createObject($config);
     }
 }

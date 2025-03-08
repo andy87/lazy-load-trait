@@ -1,8 +1,10 @@
 {
-  "name": "andy87/yii2-lazy-load-trait",
+  "name": "andy87/lazy-load-trait",
   "description": "PHP library for Yii2 - developed by and_y87",
-  "keywords": ["and_y87", "php", "traits", "lazyLoadTrait", "construct", "loading"],
+  "keywords": ["and_y87", "php", "Yii2", "traits", "lazyLoadTrait", "construct", "loading", "lazyLoad"],
+
   "homepage": "https://andy87.ru",
+
   "license": "CC-BY-SA-4.0",
 
   "version": "1.0.1",
@@ -16,17 +18,14 @@
       "email": "kidin_a@list.ru"
     }
   ],
+
   "require": {
     "php": ">=8.0"
   },
 
-  "require-dev": {
-    "yiisoft/yii2": "*"
-  },
-
   "autoload": {
     "psr-4": {
-      "andy87\\yii2\\lazyLoadTrait\\": "src/traits/"
+      "andy87\\lazy_load\\": "src/traits/"
     }
   },
 
