@@ -1,7 +1,6 @@
 <?php
 
-#namespace components\traits;
-namespace common\components\traits;
+namespace andy87\yii2\lazyLoadTrait;
 
 use Yii;
 use yii\base\{InvalidConfigException, UnknownPropertyException};

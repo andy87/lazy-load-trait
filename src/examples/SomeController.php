@@ -1,24 +1,3 @@
-Вот такая реализация пришла в голову.
-
-Инициализация свойства класса только в момент вызова(обращения к ним).
-P.S. Знаю что в PHP c версии 8.4 появилась поддержка lazyLoad из коробки, но это ещё не завезли в Yii2.
-
-Установка.
-
-Composer:
-```bash
-composer require andy87/yii2-lazy-load-trait
-```
-
-Пример использования:
-1. указать свойство в аннотации класса
-2. подключить трейт
-3. указать конфигурацию в свойстве $lazyLoadConfig
-4. обращаться к свойствам как к обычным свойствам класса
-
-
-
-```php
 <?php
 
 use andy87\yii2\lazyLoadTrait\LazyLoadTrait;
@@ -29,7 +8,7 @@ use andy87\yii2\lazyLoadTrait\LazyLoadTrait;
  * @property-read SomeComponent $someComponent
  * @property-read OtherComponent $otherComponent
  * @property-read ThirdComponent $thirdComponent
- * 
+ *
  * @package yii2\controllers
  */
 class SomeController extends \yii\web\Controller
@@ -64,7 +43,7 @@ class SomeController extends \yii\web\Controller
         if (Yii::$app->request->isPost) {
             return $this->otherComponent->someMethod();
         }
-        
+
         if (Yii::$app->request->isAjax) {
             $text = $this->thirdComponent->mextMethod();
         }
@@ -72,5 +51,3 @@ class SomeController extends \yii\web\Controller
         return $this->render('view', ['text' => $text]);
     }
 }
-```
-Home: https://github.com/andy87/yii2-lazy-load-trait
