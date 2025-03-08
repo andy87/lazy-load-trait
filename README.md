@@ -110,6 +110,7 @@ class SomeClass
     use LazyLoadTrait;
 
 
+    /** @var array  */
     public array $lazyLoadConfig = [
         'someComponent' => SomeComponent::class,
         'otherComponent' => [
@@ -126,8 +127,6 @@ class SomeClass
     ];
 
     /**
-     * @url http://domain.name/some/view
-     *
      * @return Response|string
      */
     public function actionView(): Response|string
@@ -151,4 +150,58 @@ class SomeClass
     }
 }
 ```
+
+### Для диномической сборки настроек можно перезаписать метод `findLazyLoadConfig()`
+```php
+<?php
+
+namespace some\path;
+
+use andy87\lazy_load\LazyLoadTrait;
+
+/**
+ * SomeClass
+ *
+ * @property-read SomeComponent $someComponent
+ * @property-read DymanicConfigComponent $dynamicConfigCmponent
+ * 
+ * @package yii2\controllers
+ */
+class SomeClass
+{
+    use LazyLoadTrait;
+
+
+    /** @var array  */
+    public array $lazyLoadConfig = [
+        'someComponent' => [
+            'class' => SomeComponent::class,
+            'public_property' => 'public_property OtherComponent'
+        ],
+        'dynamicConfigCmponent' => DymanicConfigComponent::class,
+    ];
+
+    /**
+     * @return Response|string
+     */
+    public function actionView(): Response|string
+    {
+        $message = $this->otherComponent->insideSomeComponent->test();
+        return $this->dynamicConfigCmponent->insideSomeComponent->test();
+    }
+    
+    
+    protected function findCachedObject(string $name): ?object
+    {
+        return match ($name)
+        {
+            '_dynamicConfigCmponent' => [
+                'class' => [SomeComponent::class, $this->getArguments() ],
+            ],
+            default => ( $this->_lazyLoadCache[$name] ?? null ),
+        }
+    }
+}
+```
+
 Home: https://github.com/andy87/lazy-load-trait
