@@ -198,7 +198,7 @@ class SomeClass
             '_dynamicConfigCmponent' => [
                 'class' => [SomeComponent::class, $this->getArguments() ],
             ],
-            default => ( $this->_lazyLoadCache[$name] ?? null ),
+            default => parent::findCachedObject($name),
         }
     }
 }
