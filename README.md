@@ -140,7 +140,11 @@ class SomeClass
         }
         
         if (Yii::$app->request->isAjax) {
-            $text = $this->thirdComponent->mextMethod();
+            $text = $this->_thirdComponent->mextMethod();
+        }
+        
+        if (Yii::$app->request->isDelete) {
+            $text = $this->_nextComponent->mextMethod();
         }
 
         return $this->render('view', ['text' => $text]);
