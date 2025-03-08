@@ -7,6 +7,7 @@ use andy87\lazy_load\LazyLoadTrait;
 use frontend\components\lazyLoadTest\OtherComponent;
 use frontend\components\lazyLoadTest\SomeComponent;
 use frontend\components\lazyLoadTest\ThirdComponent;
+use frontend\components\lazyLoadTest\NextComponent;
 
 /**
  * SomeController
@@ -26,34 +27,39 @@ class LazyLoadTest
         'someComponent' => SomeComponent::class,
         'otherComponent' => [
             'class' => OtherComponent::class,
-            'public_property' => 'value'
+            'public_property' => 'public_property OtherComponent'
         ],
-        'thirdComponent' => [
-            'class' => ThirdComponent::class,
-            ['construct_argument_1', 'construct_argument_2']
+        '_thirdComponent' => [
+            'class' => [ ThirdComponent::class, ['construct_argument_1_ThirdComponent', 'construct_argument_2_ThirdComponent'] ],
+        ],
+        '_nextComponent' => [
+            'class' => [ NextComponent::class, ['construct_argument_1_NextComponent', 'construct_argument_2_NextComponent'] ],
+            'public_property' => 'public_property NextComponent'
         ],
     ];
 
 
 
     /**
-     * @url http://127.0.0.1/index.php
-     * @url http://127.0.0.1/index.php?a=a
-     * @url http://127.0.0.1/index.php?a=b
-     *
      * @return string
      */
     public function view(): string
     {
-        // Apply LazyLoad
-        $message = $this->someComponent->method();
+        $message = '';
 
-        if ($_GET['a'] = 'a') {
-            return $this->otherComponent->method();
-        }
+        $message .= $this->someComponent->method();
+        $message .= $this->otherComponent->method();
+        $message .= $this->_thirdComponent->method();
+        $message .= $this->_nextComponent->method();
 
-        if ($_GET['b'] = 'b') {
-            $message = $this->thirdComponent->method();
+        if (isset($_GET['a']))
+        {
+            $message .= match ($_GET['a']) {
+                'b' => $this->otherComponent->method(),
+                'c' => $this->_thirdComponent->method(),
+                'd' => $this->_nextComponent->method(),
+                default => $this->someComponent->method(),
+            };
         }
 
         return $message;

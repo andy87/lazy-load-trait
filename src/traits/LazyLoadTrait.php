@@ -12,22 +12,33 @@ use Exception;
  * Пример использования:
  * ```php
  *
- * use some\path\Some;
- * use some\directory\Next;
- * use some\location\Third;
+ * use some\path\SomeComponent;
+ * use some\directory\OtherComponent;
+ * use some\location\ThirdComponent;
+ * use some\target\NextComponent;
  *
- * @property-read Some $some (пример)
- * @property-read Next $next (пример)
- * @property-read Third $_third (пример)
+ * @property-read SomeComponent $someComponent (пример)
+ * @property-read OtherComponent $otherComponent (пример)
+ * @property-read ThirdComponent $_thirdComponent (пример - singletone)
+ * @property-read NextComponent $_nextComponent (пример - singletone)
  *
  * class ProfileController extends yii\web\Controller
  * {
  *     use LazyLoadTrait;
  *
  *     public array $lazyLoadConfig = [
- *         'some' => Some::class,
- *         'next' => ['class' => Next::class],
- *         '_third' => [['class' => Third::class], ['token']], // Singleton
+ *          'someComponent' => SomeComponent::class,
+ *          'otherComponent' => [
+ *              'class' => OtherComponent::class,
+ *              'public_property' => 'value'
+ *          ],
+ *          '_thirdComponent' => [ //singletone
+ *              'class' => [ ThirdComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
+ *          ],
+ *          '_nextComponent' => [ //singletone
+ *              'class' => [ NextComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
+ *              'public_property' => 'value'
+ *          ],
  *     ];
  * }
  * ```
@@ -38,13 +49,14 @@ trait LazyLoadTrait
     protected array $_lazyLoadCache = [];
 
 
-
     /**
      * Переопределение метода __get
      *
      * @param string $name Имя запрашиваемого в `BaseObject` свойства
      *
      * @return mixed
+     *
+     * @throws Exception
      */
     public function __get($name): mixed
     {
@@ -61,6 +73,8 @@ trait LazyLoadTrait
      * @param string $name Имя свойства
      *
      * @return ?object
+     *
+     * @throws Exception
      */
     public function getLazyLoadObject(string $name): ?object
     {
@@ -91,7 +105,7 @@ trait LazyLoadTrait
     }
 
     /**
-     * Поиск/получение LazyLoad конфигурации 
+     * Поиск/получение LazyLoad конфигурации
      *
      * @param string $name
      *
@@ -111,25 +125,63 @@ trait LazyLoadTrait
      *
      * @throws Exception
      */
-    protected function constructLazyObject(array|string $config): object
+    protected function constructLazyObject( array|string $config ): object
     {
-        if (is_array($config))
-        {
-            if (count($config) > 1 && !isset($config['class'])) {
+        if ( is_string($config) ) {
+
+            $object = $this->builder( $config );
+
+        } elseif ( is_array($config) ) {
+
+            $arguments = [];
+            $property = [];
+
+            if ( !isset($config['class']) ) {
                 throw new Exception('Конфигурация должна содержать ключ "class".');
             }
 
-            $object = new $config['class']();
+            $className = $config['class'];
 
-            if (isset($config[0]) && is_array($config[0])) {
-                foreach ($config[0] as $name => $value) {
-                    $object->$name = $value;
+            if ( is_array( $className ) ) {
+                $arguments = $config['class'];
+                $className = array_shift($arguments );
+
+                if(count($arguments)) $arguments = $arguments[0];
+
+                if ( !is_string($className) ) {
+                    throw new Exception('Ключ "class" должен содержать строку.');
                 }
             }
 
+            if ( count( $config ) > 1 )
+            {
+                $property = $config;
+                unset($property['class']);
+            }
+
+            $object = $this->builder( $className, $arguments, $property );
+
         } else {
 
-            $object = new $config();
+            throw new Exception('Конфигурация должна содержать ключ "class".');
+        }
+
+        return $object;
+    }
+
+    /**
+     * @param string $className
+     * @param array $arguments
+     * @param array $property
+     *
+     * @return mixed
+     */
+    public function builder( string $className, array $arguments = [], array $property = [] ): object
+    {
+        $object = new $className( ...$arguments  );
+
+        foreach ( $property as $name => $value ){
+            $object->$name = $value;
         }
 
         return $object;

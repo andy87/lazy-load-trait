@@ -2,19 +2,22 @@
 
 namespace frontend\components\lazyLoadTest;
 
-use yii\base\BaseObject;
-
 /**
  * < Frontend > `OtherComponent`
  *
  * @package yii2\frontend\components\test
  */
-class OtherComponent extends BaseObject
+class OtherComponent
 {
     public string $public_property;
 
+    public function __construct()
+    {
+        echo '<br><br> <b>construct</b> ' . __METHOD__;
+    }
+
     public function method()
     {
-        return __METHOD__;
+        return "<br><br>" . __METHOD__;
     }
 }

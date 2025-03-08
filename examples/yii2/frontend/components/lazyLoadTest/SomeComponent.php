@@ -9,9 +9,13 @@ namespace frontend\components\lazyLoadTest;
  */
 class SomeComponent
 {
+    public function __construct()
+    {
+        echo '<br><br> <b>construct</b> ' . __METHOD__;
+    }
 
     public function method()
     {
-        return __METHOD__;
+        return "<br><br>" . __METHOD__;
     }
 }

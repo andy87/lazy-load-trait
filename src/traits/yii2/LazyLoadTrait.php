@@ -13,22 +13,33 @@ use yii\base\{InvalidConfigException, UnknownPropertyException};
  * Пример использования:
  * ```php
  *
- * use some\path\Some;
- * use some\directory\Next;
- * use some\location\Third;
+ * use some\path\SomeComponent;
+ * use some\directory\OtherComponent;
+ * use some\location\ThirdComponent;
+ * use some\target\NextComponent;
  *
- * @property-read Some $some (пример)
- * @property-read Next $next (пример)
- * @property-read Third $_third (пример)
+ * @property-read SomeComponent $someComponent (пример)
+ * @property-read OtherComponent $otherComponent (пример)
+ * @property-read ThirdComponent $_thirdComponent (пример)
+ * @property-read NextComponent $_nextComponent (пример)
  *
  * class ProfileController extends yii\web\Controller
  * {
  *     use LazyLoadTrait;
  *
  *     public array $lazyLoadConfig = [
- *         'some' => Some::class,
- *         'next' => ['class' => Next::class],
- *         '_third' => [['class' => Third::class], ['token']], // Singleton
+ *          'someComponent' => SomeComponent::class,
+ *          'otherComponent' => [
+ *              'class' => OtherComponent::class,
+ *              'public_property' => 'value'
+ *          ],
+ *          '_thirdComponent' => [
+ *              'class' => [ ThirdComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
+ *          ],
+ *          '_nextComponent' => [
+ *              'class' => [ NextComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
+ *              'public_property' => 'value'
+ *          ],
  *     ];
  * }
  * ```
@@ -56,27 +67,30 @@ trait LazyLoadTrait
     }
 
     /**
-     * Создание LazyLoad объекта на основе конфигурации
+     * @param string $className
+     * @param array $arguments
+     * @param array $property
      *
-     * @param array|string $config Конфигурация объекта
+     * @return mixed
      *
-     * @return object
-     *
-     * @throws Exception
+     * @throws InvalidConfigException|UnknownPropertyException
      */
-    protected function constructLazyObject(array|string $config): object
+    public function builder( string $className, array $arguments = [], array $property = [] ): object
     {
-        if (is_array($config))
+        if (count($property))
         {
-            if (count($config) > 1 && !isset($config['class'])) {
-                throw new InvalidConfigException('Конфигурация должна содержать ключ "class".');
-            }
+            $config = [
+                'class' => $className,
+                ...$property
+            ];
 
-            if (isset($config[0]) && is_array($config[0])) {
-                return Yii::createObject( $config['class'], $config[0] );
-            }
+        } else {
+
+            $config = $className;
         }
 
-        return Yii::createObject($config);
+        return (count($arguments) )
+            ? Yii::createObject( $config, $arguments )
+            : Yii::createObject( $config );
     }
 }

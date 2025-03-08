@@ -1,12 +1,13 @@
 <?php
 
-namespace frontend\controllers;
+namespace yii2\frontend\controllers;
 
 use Yii;
 use andy87\lazy_load\yii2\LazyLoadTrait;
 use frontend\components\lazyLoadTest\OtherComponent;
 use frontend\components\lazyLoadTest\SomeComponent;
 use frontend\components\lazyLoadTest\ThirdComponent;
+use frontend\components\lazyLoadTest\NextComponent;
 
 /**
  * SomeController
@@ -14,6 +15,7 @@ use frontend\components\lazyLoadTest\ThirdComponent;
  * @property-read SomeComponent $someComponent
  * @property-read OtherComponent $otherComponent
  * @property-read ThirdComponent $thirdComponent
+ * @property-read NextComponent $_nextComponent
  *
  * @package yii2\controllers
  */
@@ -25,44 +27,44 @@ class LazyLoadTestController extends \yii\web\Controller
         'someComponent' => SomeComponent::class,
         'otherComponent' => [
             'class' => OtherComponent::class,
-            'public_property' => 'public_property'
+            'public_property' => 'public_property OtherComponent'
         ],
-        'thirdComponent' => [
-            'class' => ThirdComponent::class,
-            ['construct_argument_1','construct_argument_2']
+        '_thirdComponent' => [
+            'class' => [ ThirdComponent::class, ['construct_argument_1_ThirdComponent', 'construct_argument_2_ThirdComponent'] ],
+        ],
+        '_nextComponent' => [
+            'class' => [ NextComponent::class, ['construct_argument_1_NextComponent', 'construct_argument_2_NextComponent'] ],
+            'public_property' => 'public_property NextComponent'
         ],
     ];
 
     /**
-     * @url http://127.0.0.1/lazy-load-test
      * @url http://127.0.0.1/lazy-load-test?a=a
      * @url http://127.0.0.1/lazy-load-test?a=b
+     * @url http://127.0.0.1/lazy-load-test?a=c
+     * @url http://127.0.0.1/lazy-load-test?a=d
      *
      * @return string
      */
     public function actionIndex(): string
     {
-        $get = Yii::$app->request->get('a');
+        $message = '';
 
-        switch ($get) {
+        $message .= $this->someComponent->method();
+        $message .= $this->otherComponent->method();
+        $message .= $this->_thirdComponent->method();
+        $message .= $this->_nextComponent->method();
 
-            case 'a' :
-                $text = $this->otherComponent->method();
-                $text .= ( "<br> public_property = " . $this->otherComponent->public_property );
-                break;
-
-            case 'b' :
-                $text = $this->thirdComponent->method();
-
-                $text .= ( "<br> construct_argument_1 = " . $this->thirdComponent->construct_argument_1 );
-                $text .= ( "<br> construct_argument_2 = " . $this->thirdComponent->construct_argument_2 );
-                break;
-
-            default :
-                $text = $this->someComponent->method();
-                break;
+        if (isset($_GET['a']))
+        {
+            $message .= match ($_GET['a']) {
+                'b' => $this->otherComponent->method(),
+                'c' => $this->_thirdComponent->method(),
+                'd' => $this->_nextComponent->method(),
+                default => $this->someComponent->method(),
+            };
         }
 
-        return $text;
+        return  $message;
     }
 }
