@@ -190,8 +190,7 @@ class SomeClass
         return $this->dynamicConfigCmponent->insideSomeComponent->test();
     }
     
-    
-    protected function findCachedObject(string $name): ?object
+    protected function findLazyLoadConfig(string $name): ?object
     {
         return match ($name)
         {
