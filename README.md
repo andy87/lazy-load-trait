@@ -115,14 +115,14 @@ class SomeClass
         'someComponent' => SomeComponent::class,
         'otherComponent' => [
             'class' => OtherComponent::class,
-            'public_property' => 'public_property OtherComponent'
+            'public_property' => 'some value'
         ],
         '_thirdComponent' => [
-            'class' => [ ThirdComponent::class, ['construct_argument_1_ThirdComponent', 'construct_argument_2_ThirdComponent'] ],
+            'class' => [ ThirdComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
         ],
         '_nextComponent' => [
-            'class' => [ NextComponent::class, ['construct_argument_1_NextComponent', 'construct_argument_2_NextComponent'] ],
-            'public_property' => 'public_property NextComponent'
+            'class' => [ NextComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
+            'public_property' => 'some value'
         ],
     ];
 
@@ -176,7 +176,7 @@ class SomeClass
     public array $lazyLoadConfig = [
         'someComponent' => [
             'class' => SomeComponent::class,
-            'public_property' => 'public_property OtherComponent'
+            'public_property' => 'some value'
         ],
         'dynamicConfigCmponent' => DymanicConfigComponent::class,
     ];
