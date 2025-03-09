@@ -10,8 +10,10 @@ Composer:
 composer require andy87/lazy-load-trait
 ```
 
-## Порядок дейсвий для использования:
-### указать свойство в аннотации класса
+## Использование. Порядок дейсвий.
+
+### 1. Аннотации
+Указать свойство в аннотации класса
 ```php
 /**
  * SomeClass
@@ -27,18 +29,18 @@ class SomeClass
 }
 ```
 
-### подключить трейт
-
-для подключения трейта в классе имеется 2 версии Trait'ов:
+### 2. Добавление use
+Для подключения трейта в классе имеется 2 варианта Trait'ов:
 * `andy87\lazy_load\yii2\LazyLoadTrait` - для использования в фреймворке Yii2 с применением метода `Yii::createObject()`
 * `andy87\lazy_load\LazyLoadTrait` - для использования вне фреймворка Yii2
 
-### указать конфигурацию в свойстве $lazyLoadConfig
+### 3. Конфигурация свойств
+указать конфигурацию в свойстве `$lazyLoadConfig`
 
 Структура конфигурации.
 * для использования свойства как экземпляр класса (без настроек), доступно 2 варианта:
 ```php
-    $lazyLoadConfig = [
+    public array $lazyLoadConfig = [
         'someComponent' => SomeComponent::class, // быстрый способ ( меньше проверок )
         'otherComponent' => [
             'class' => OtherComponent::class,  // способ поедленней ( больше проверок )
@@ -48,7 +50,7 @@ class SomeClass
 
 * с назначением публичных свойств класса
 ```php
-    $lazyLoadConfig = [
+    public array $lazyLoadConfig = [
       'otherComponent' => [
             'class' => OtherComponent::class,
             'public_property_1' => 'value_1',
@@ -59,7 +61,7 @@ class SomeClass
 
 * с передачей параметров в аргументы функции `__construct()` 
 ```php
-    $lazyLoadConfig = [
+    public array $lazyLoadConfig = [
        'thirdComponent' => [
             'class' => [ ThirdComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
         ],
@@ -67,7 +69,7 @@ class SomeClass
 ```
 * комбинирование назначения публичных свойств и передача параметров в аргументы функции `__construct()`
 ```php
-    $lazyLoadConfig = [
+    public array $lazyLoadConfig = [
          'nextComponent' => [
             'class' => [ NextComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
             'public_property_1' => 'value_1',
@@ -78,7 +80,7 @@ class SomeClass
 * добавление объекта в `cache` с последующим переиспользованием закешированой версии
 __добавление к имени своства префикса(нижнее подчеркивание `_`)__
 ```php
-    $lazyLoadConfig = [
+    public array $lazyLoadConfig = [
         '_nextComponent' => [ // данное своство при первом обращении будет закешировано, и при последующих обращениях будет использоваться закешированная версия
             'class' => [ NextComponent::class, ['construct_argument_1', 'construct_argument_2'] ],
             'public_property_1' => 'value_1',
@@ -88,7 +90,8 @@ __добавление к имени своства префикса(нижне�
 ```
 
 
-### обращаться к свойствам как к обычным свойствам класса
+### 4.Использование
+Обращаться к свойствам как к обычным свойствам класса
 ```php
 <?php
 
@@ -127,9 +130,9 @@ class SomeClass
     ];
 
     /**
-     * @return Response|string
+     * @return string
      */
-    public function actionView(): Response|string
+    public function actionView(): string
     {
         // Apply LazyLoad
         $text = $this->someComponent->insideSomeComponent->test();
@@ -182,9 +185,9 @@ class SomeClass
     ];
 
     /**
-     * @return Response|string
+     * @return string
      */
-    public function actionView(): Response|string
+    public function actionView(): string
     {
         $message = $this->otherComponent->insideSomeComponent->test();
         return $this->dynamicConfigCmponent->insideSomeComponent->test();
