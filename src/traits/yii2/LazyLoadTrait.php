@@ -79,10 +79,7 @@ trait LazyLoadTrait
     {
         if (count($property))
         {
-            $config = [
-                'class' => $className,
-                ...$property
-            ];
+            $config = array_merge([ 'class' => $className ], $property );
 
         } else {
 
