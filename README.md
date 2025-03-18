@@ -216,7 +216,7 @@ Yii::$container->get('someComponent')
 ```
 Ленивая загрузка компоненов приложения:
 ```
-// condig.php
+// config/web.php | (frontend|backend|common)/config/main.php
 'components' => [
     'someComponent' => [
         'class' => 'some\path\SomeComponent',
