@@ -59,11 +59,11 @@ trait LazyLoadTrait
      */
     public function __get($name): mixed
     {
-        if ($lazyLoadObject = $this->getLazyLoadObject($name)) {
-            return $lazyLoadObject;
-        }
+        if ($lazyLoadObject = $this->getLazyLoadObject($name)) return $lazyLoadObject;
 
-        return parent::__get($name);
+        if (get_parent_class($this)) return parent::__get($name);
+
+        return null;
     }
 
     /**
@@ -77,14 +77,9 @@ trait LazyLoadTrait
      */
     public function builder( string $className, array $arguments = [], array $property = [] ): object
     {
-        if (count($property))
-        {
-            $config = array_merge([ 'class' => $className ], $property );
-
-        } else {
-
-            $config = $className;
-        }
+        $config = (count($property))
+            ? array_merge([ 'class' => $className ], $property )
+            : $className;
 
         return (count($arguments) )
             ? Yii::createObject( $config, $arguments )
