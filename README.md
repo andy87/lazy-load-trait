@@ -206,4 +206,27 @@ class SomeClass
 }
 ```
 
+
+## P.S. в Yii2 имеется.
+регистрация класса и вызов его через контейнер:
+```
+Yii::$container->set('someComponent', SomeComponent::class);
+
+Yii::$container->get('someComponent')
+```
+Ленивая загрузка компоненов приложения:
+```
+// config/web.php | (frontend|backend|common)/config/main.php
+'components' => [
+    'someComponent' => [
+        'class' => 'some\path\SomeComponent',
+        'property' => 'value',
+    ],
+],
+
+
+//use
+$component = Yii::$app->someComponent; // Создается только при обращении
+```
+
 Home: https://github.com/andy87/lazy-load-trait
